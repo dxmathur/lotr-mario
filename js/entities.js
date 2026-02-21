@@ -320,6 +320,7 @@ class Enemy {
         const dist = Math.abs(player.x - this.x);
         if (dist > 800 && this.type !== 'chaser') return false;
 
+        this.time += dt;
         this.animTimer += dt;
         if (this.animTimer > 10) {
             this.animTimer = 0;
@@ -349,7 +350,7 @@ class Enemy {
             case 'flyer':
                 this.vx = this.speed * this.facing;
                 this.x += this.vx * dt;
-                this.y = this.startY + Math.sin((this.animTimer * 0.3 + this.sinOffset)) * 30;
+                this.y = this.startY + Math.sin((this.time * 0.08 + this.sinOffset)) * 30;
                 // Turn at walls
                 const fwallTile = level.getTile(
                     Math.floor((this.facing > 0 ? this.x + this.w + 1 : this.x - 1) / TILE),
