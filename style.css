@@ -18,4 +18,5 @@ canvas {
     image-rendering: crisp-edges;
     border: 2px solid #333;
     cursor: none;
+    transform: scale(1.8);
 }
