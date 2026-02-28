@@ -145,7 +145,7 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
-        '..........',
+        '....PP....',
         '..........',
         '##......##',
         '##......##',
@@ -285,8 +285,8 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
-        '..S....S..',
-        '..S....S..',
+        '..........',
+        '..........',
         '..S....S..',
         '..S....S..',
         '..S....S..',
@@ -342,7 +342,7 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
-        '..........',
+        '....PP....',
         '..........',
         '..XXXXXX..',
         '##########',
@@ -362,7 +362,7 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
-        '..........',
+        '###....###',
         '###LLLL###',
         '##########',
     ]),
@@ -373,11 +373,11 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
+        '..........',
+        '..........',
         '....SS....',
         '....SS....',
         '...SSSS...',
-        '...SSSS...',
-        '..SSSSSS..',
         '..SSSSSS..',
         '.SSSSSSSS.',
         '.SSSSSSSS.',
@@ -444,15 +444,15 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '........D.',
+        '........D.',
+        '........D.',
         '........F.',
-        '........S.',
-        '........S.',
-        '........S.',
-        '........S.',
-        '........S.',
-        '........S.',
-        '........S.',
-        '........S.',
         '##########',
         '##########',
     ]),
@@ -464,8 +464,8 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
+        'SSSS..SSSS',
         '..........',
-        'SSSSSSSSSS',
         '..........',
         '..........',
         '..........',
@@ -482,11 +482,11 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
+        'SSSS..SSSS',
         '..........',
-        'SSSSSSSSSS',
         '..........',
+        'SSSS..SSSS',
         '..........',
-        'SSSSSSSSSS',
         '..........',
         '..........',
         '##########',
@@ -551,16 +551,16 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '.........S',
         '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
-        '........SS',
+        '.......SSS',
+        '......SSSS',
+        '......SSSS',
         '##########',
         '##########',
     ]),
@@ -577,10 +577,10 @@ const CHUNKS = {
         '..........',
         '..........',
         '..........',
-        '..........',
         'PPP..PP..P',
         '..........',
-        '..........',
+        '##########',
+        '##########',
     ]),
 
     cave_ceiling: parseChunk([
@@ -654,6 +654,170 @@ const CHUNKS = {
         '##########',
         '##########',
     ]),
+
+    // ── Puzzle Chunks ──
+
+    spike_gauntlet: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '.PPP.PPP..',
+        '..........',
+        '..........',
+        '.XXXXXXXX.',
+        '##########',
+        '##########',
+    ]),
+
+    lava_pit: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '....PP....',
+        '..........',
+        '..........',
+        '##......##',
+        '##LLLLLL##',
+        '##########',
+    ]),
+
+    island_hop: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        'PP..PP..PP',
+        '..........',
+        '..........',
+        '..XXXXXX..',
+        '##########',
+        '##########',
+    ]),
+
+    brick_secret: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..CCCCCC..',
+        '..BBBBBB..',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '##########',
+        '##########',
+    ]),
+
+    elevated_run: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        'SSSSSSSSSS',
+        '..........',
+        '..........',
+        '..........',
+        '..XX..XX..',
+        '..........',
+        '##########',
+        '##########',
+    ]),
+
+    pit_run: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '#.##.##.##',
+        '##########',
+    ]),
+
+    double_gap: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '##..SS..##',
+        '##..SS..##',
+    ]),
+
+    spike_corridor: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        'SSSS..SSSS',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..XXXXXX..',
+        '##########',
+        '##########',
+    ]),
+
+    lava_bridge: parseChunk([
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        'PPPPPPPPPP',
+        '..........',
+        '..........',
+        'LLLLLLLLLL',
+        '##########',
+    ]),
 };
 
 // Enemy spawn definitions for each level
@@ -698,46 +862,47 @@ function buildLevel(chunkNames) {
 }
 
 // Level templates for each character (3 levels each)
+// L1: Easy (intro, teach mechanics), L2: Medium (puzzles + hazards), L3: Hard (everything + boss)
 const LEVEL_DEFS = {
     frodo: [
-        { name: 'The Shire', chunks: ['start', 'flat', 'coins_low', 'pipe_small', 'flat', 'gap_small', 'coins_low', 'bricks_mid', 'flat', 'platform_steps', 'coins_low', 'flat', 'end_flag'] },
-        { name: 'Emyn Muil', chunks: ['start', 'stairs_up', 'bricks_high', 'gap_medium', 'platform_steps', 'valley', 'coins_high', 'pillars', 'spike_run', 'floating_platforms', 'bricks_mixed', 'arena', 'end_flag'] },
-        { name: 'Mount Doom', chunks: ['start', 'lava_gap', 'spike_run', 'gap_large', 'mixed_hazard', 'tower', 'broken_bridge', 'lava_gap', 'corridor', 'spike_run', 'boss_arena', 'boss_arena', 'end_flag'] },
+        { name: 'The Shire', chunks: ['start', 'flat', 'coins_low', 'pipe_small', 'gap_small', 'coins_low', 'bricks_mid', 'platform_steps', 'flat', 'brick_secret', 'end_flag'] },
+        { name: 'Emyn Muil', chunks: ['start', 'stairs_up', 'platform_steps', 'gap_medium', 'coins_high', 'valley', 'spike_run', 'floating_platforms', 'double_gap', 'arena', 'bricks_mixed', 'end_flag'] },
+        { name: 'Mount Doom', chunks: ['start', 'lava_gap', 'spike_gauntlet', 'gap_large', 'lava_pit', 'tower', 'corridor', 'spike_run', 'island_hop', 'lava_bridge', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     aragorn: [
-        { name: 'Weathertop', chunks: ['start', 'flat', 'stairs_up', 'coins_low', 'bricks_mid', 'flat', 'gap_small', 'pipe_small', 'coins_low', 'stairs_down', 'flat', 'flat', 'end_flag'] },
-        { name: "Helm's Deep", chunks: ['start', 'fortress_wall', 'stairs_up', 'pillars', 'gap_medium', 'bricks_high', 'valley', 'spike_run', 'platform_steps', 'arena', 'bricks_mixed', 'corridor', 'end_flag'] },
-        { name: 'Pelennor Fields', chunks: ['start', 'flat', 'gap_large', 'mixed_hazard', 'tower', 'lava_gap', 'broken_bridge', 'spike_run', 'zigzag', 'boss_arena', 'boss_arena', 'arena', 'end_flag'] },
+        { name: 'Weathertop', chunks: ['start', 'flat', 'stairs_up', 'coins_low', 'bricks_mid', 'gap_small', 'pipe_small', 'pit_run', 'stairs_down', 'flat', 'end_flag'] },
+        { name: "Helm's Deep", chunks: ['start', 'fortress_wall', 'pillars', 'gap_medium', 'bricks_high', 'valley', 'spike_run', 'platform_steps', 'elevated_run', 'arena', 'corridor', 'end_flag'] },
+        { name: 'Pelennor Fields', chunks: ['start', 'gap_large', 'lava_pit', 'tower', 'mixed_hazard', 'spike_gauntlet', 'broken_bridge', 'lava_bridge', 'zigzag', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     gandalf: [
-        { name: 'Moria', chunks: ['start', 'cave_ceiling', 'flat', 'coins_low', 'pillars', 'gap_small', 'bricks_mid', 'tunnel', 'coins_low', 'flat', 'pipe_small', 'flat', 'end_flag'] },
-        { name: 'Fangorn', chunks: ['start', 'flat', 'platform_steps', 'bricks_high', 'gap_medium', 'floating_platforms', 'valley', 'coins_high', 'pillars', 'spike_run', 'arena', 'corridor', 'end_flag'] },
-        { name: 'Minas Tirith', chunks: ['start', 'stairs_up', 'tower', 'gap_large', 'mixed_hazard', 'lava_gap', 'zigzag', 'fortress_wall', 'spike_run', 'boss_arena', 'boss_arena', 'corridor', 'end_flag'] },
+        { name: 'Moria', chunks: ['start', 'cave_ceiling', 'flat', 'coins_low', 'gap_small', 'bricks_mid', 'tunnel', 'flat', 'pipe_small', 'brick_secret', 'end_flag'] },
+        { name: 'Fangorn', chunks: ['start', 'platform_steps', 'bricks_high', 'gap_medium', 'floating_platforms', 'valley', 'coins_high', 'spike_run', 'double_gap', 'arena', 'corridor', 'end_flag'] },
+        { name: 'Minas Tirith', chunks: ['start', 'stairs_up', 'tower', 'gap_large', 'lava_gap', 'fortress_wall', 'spike_gauntlet', 'lava_pit', 'spike_corridor', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     legolas: [
-        { name: 'Mirkwood', chunks: ['start', 'flat', 'coins_low', 'floating_platforms', 'flat', 'gap_small', 'bricks_mid', 'platform_steps', 'coins_low', 'pipe_small', 'flat', 'flat', 'end_flag'] },
-        { name: 'Lothlorien', chunks: ['start', 'coin_heaven', 'platform_steps', 'gap_medium', 'bricks_high', 'floating_platforms', 'valley', 'pillars', 'coins_high', 'spike_run', 'arena', 'bricks_mixed', 'end_flag'] },
-        { name: 'Black Gate', chunks: ['start', 'fortress_wall', 'gap_large', 'mixed_hazard', 'tower', 'broken_bridge', 'lava_gap', 'spike_run', 'zigzag', 'boss_arena', 'boss_arena', 'arena', 'end_flag'] },
+        { name: 'Mirkwood', chunks: ['start', 'flat', 'coins_low', 'floating_platforms', 'gap_small', 'bricks_mid', 'platform_steps', 'flat', 'pipe_small', 'brick_secret', 'end_flag'] },
+        { name: 'Lothlorien', chunks: ['start', 'coin_heaven', 'platform_steps', 'gap_medium', 'bricks_high', 'floating_platforms', 'valley', 'spike_run', 'elevated_run', 'arena', 'bricks_mixed', 'end_flag'] },
+        { name: 'Black Gate', chunks: ['start', 'fortress_wall', 'gap_large', 'tower', 'lava_pit', 'broken_bridge', 'spike_gauntlet', 'lava_bridge', 'zigzag', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     gimli: [
-        { name: 'Glittering Caves', chunks: ['start', 'cave_ceiling', 'coins_low', 'flat', 'pillars', 'gap_small', 'bricks_mid', 'flat', 'coins_low', 'pipe_small', 'tunnel', 'flat', 'end_flag'] },
-        { name: 'Moria Depths', chunks: ['start', 'cave_ceiling', 'tunnel', 'gap_medium', 'spike_run', 'platform_steps', 'valley', 'bricks_high', 'coins_high', 'pillars', 'arena', 'corridor', 'end_flag'] },
-        { name: 'Isengard', chunks: ['start', 'tower', 'fortress_wall', 'gap_large', 'mixed_hazard', 'lava_gap', 'broken_bridge', 'spike_run', 'zigzag', 'boss_arena', 'boss_arena', 'arena', 'end_flag'] },
+        { name: 'Glittering Caves', chunks: ['start', 'cave_ceiling', 'flat', 'coins_low', 'gap_small', 'bricks_mid', 'tunnel', 'flat', 'pipe_small', 'pit_run', 'end_flag'] },
+        { name: 'Moria Depths', chunks: ['start', 'cave_ceiling', 'tunnel', 'gap_medium', 'spike_run', 'platform_steps', 'valley', 'bricks_high', 'spike_corridor', 'arena', 'corridor', 'end_flag'] },
+        { name: 'Isengard', chunks: ['start', 'tower', 'fortress_wall', 'gap_large', 'lava_pit', 'spike_gauntlet', 'broken_bridge', 'lava_bridge', 'zigzag', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     sauron: [
-        { name: 'Barad-dur', chunks: ['start', 'tower', 'flat', 'coins_low', 'fortress_wall', 'gap_small', 'bricks_mid', 'flat', 'pillars', 'corridor', 'flat', 'flat', 'end_flag'] },
-        { name: 'Mordor Plains', chunks: ['start', 'lava_gap', 'spike_run', 'gap_medium', 'bricks_high', 'valley', 'floating_platforms', 'coins_high', 'mixed_hazard', 'spike_run', 'arena', 'corridor', 'end_flag'] },
-        { name: 'Mount Doom', chunks: ['start', 'lava_gap', 'lava_gap', 'gap_large', 'mixed_hazard', 'tower', 'broken_bridge', 'spike_run', 'zigzag', 'boss_arena', 'boss_arena', 'lava_gap', 'end_flag'] },
+        { name: 'Barad-dur', chunks: ['start', 'tower', 'flat', 'coins_low', 'fortress_wall', 'gap_small', 'bricks_mid', 'flat', 'corridor', 'pit_run', 'end_flag'] },
+        { name: 'Mordor Plains', chunks: ['start', 'lava_gap', 'spike_run', 'gap_medium', 'bricks_high', 'valley', 'floating_platforms', 'mixed_hazard', 'elevated_run', 'arena', 'corridor', 'end_flag'] },
+        { name: 'Mount Doom', chunks: ['start', 'lava_gap', 'lava_pit', 'gap_large', 'spike_gauntlet', 'tower', 'broken_bridge', 'lava_bridge', 'zigzag', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     saruman: [
-        { name: 'Orthanc', chunks: ['start', 'tower', 'stairs_up', 'coins_low', 'flat', 'gap_small', 'bricks_mid', 'fortress_wall', 'coins_low', 'pipe_small', 'flat', 'flat', 'end_flag'] },
-        { name: 'Fangorn', chunks: ['start', 'flat', 'platform_steps', 'gap_medium', 'floating_platforms', 'bricks_high', 'valley', 'pillars', 'coins_high', 'spike_run', 'arena', 'corridor', 'end_flag'] },
-        { name: 'The Shire (Corrupted)', chunks: ['start', 'flat', 'gap_large', 'mixed_hazard', 'spike_run', 'lava_gap', 'broken_bridge', 'tower', 'zigzag', 'boss_arena', 'boss_arena', 'arena', 'end_flag'] },
+        { name: 'Orthanc', chunks: ['start', 'tower', 'stairs_up', 'coins_low', 'gap_small', 'bricks_mid', 'fortress_wall', 'flat', 'pipe_small', 'brick_secret', 'end_flag'] },
+        { name: 'Fangorn', chunks: ['start', 'platform_steps', 'gap_medium', 'floating_platforms', 'bricks_high', 'valley', 'spike_run', 'double_gap', 'arena', 'corridor', 'bricks_mixed', 'end_flag'] },
+        { name: 'The Shire (Corrupted)', chunks: ['start', 'gap_large', 'spike_gauntlet', 'lava_gap', 'lava_pit', 'broken_bridge', 'tower', 'spike_corridor', 'zigzag', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
     gollum: [
-        { name: 'Misty Mountains', chunks: ['start', 'cave_ceiling', 'flat', 'coins_low', 'gap_small', 'tunnel', 'bricks_mid', 'flat', 'coins_low', 'pipe_small', 'flat', 'flat', 'end_flag'] },
-        { name: 'Dead Marshes', chunks: ['start', 'flat', 'lava_gap', 'gap_medium', 'platform_steps', 'valley', 'bricks_high', 'floating_platforms', 'coins_high', 'spike_run', 'arena', 'corridor', 'end_flag'] },
-        { name: "Shelob's Lair", chunks: ['start', 'cave_ceiling', 'tunnel', 'gap_large', 'mixed_hazard', 'spike_run', 'broken_bridge', 'lava_gap', 'zigzag', 'boss_arena', 'boss_arena', 'cave_ceiling', 'end_flag'] },
+        { name: 'Misty Mountains', chunks: ['start', 'cave_ceiling', 'flat', 'coins_low', 'gap_small', 'tunnel', 'bricks_mid', 'flat', 'pipe_small', 'pit_run', 'end_flag'] },
+        { name: 'Dead Marshes', chunks: ['start', 'lava_gap', 'gap_medium', 'platform_steps', 'valley', 'bricks_high', 'floating_platforms', 'spike_run', 'double_gap', 'arena', 'corridor', 'end_flag'] },
+        { name: "Shelob's Lair", chunks: ['start', 'cave_ceiling', 'tunnel', 'gap_large', 'spike_gauntlet', 'lava_pit', 'broken_bridge', 'lava_bridge', 'zigzag', 'island_hop', 'boss_arena', 'boss_arena', 'end_flag'] },
     ],
 };
 
@@ -747,30 +912,35 @@ function getEnemiesForLevel(charId, levelIdx, chunkNames) {
     const levelLen = chunkNames.length;
 
     // Difficulty scaling
-    const density = [0.3, 0.5, 0.7][levelIdx]; // Enemies per chunk
+    const density = [0.3, 0.55, 0.75][levelIdx];
     const types = [
         ['walker'],
         ['walker', 'flyer', 'shooter'],
         ['walker', 'flyer', 'shooter', 'heavy', 'chaser'],
     ][levelIdx];
 
+    // Chunks where enemies shouldn't spawn (hazard/puzzle/boss/flag chunks)
+    const noSpawn = ['start', 'end_flag', 'boss_arena', 'lava_pit', 'lava_gap', 'lava_bridge'];
+
     for (let ci = 2; ci < levelLen - 1; ci++) {
+        const chunkName = chunkNames[ci];
+        if (noSpawn.includes(chunkName)) continue;
+
         if (Math.random() < density) {
             const type = types[Math.floor(Math.random() * types.length)];
-            const ex = ci * 10 + 3 + Math.floor(Math.random() * 5);
+            const ex = ci * 10 + 3 + Math.floor(Math.random() * 4);
             let ey;
             if (type === 'flyer') {
-                ey = 6 + Math.floor(Math.random() * 4);
+                ey = 5 + Math.floor(Math.random() * 4);
             } else {
-                ey = 12; // On ground level
+                ey = 10; // Spawn above ground, gravity drops them down
             }
             enemies.push({ x: ex * TILE, y: ey * TILE, type });
         }
-        // Add a second enemy on harder levels
         if (levelIdx >= 1 && Math.random() < density * 0.5) {
             const type = types[Math.floor(Math.random() * types.length)];
-            const ex = ci * 10 + 1 + Math.floor(Math.random() * 7);
-            let ey = type === 'flyer' ? 7 : 12;
+            const ex = ci * 10 + 2 + Math.floor(Math.random() * 6);
+            let ey = type === 'flyer' ? 6 : 10;
             enemies.push({ x: ex * TILE, y: ey * TILE, type });
         }
     }
@@ -780,7 +950,7 @@ function getEnemiesForLevel(charId, levelIdx, chunkNames) {
         const bossChunk = levelLen - 3;
         enemies.push({
             x: (bossChunk * 10 + 5) * TILE,
-            y: 11 * TILE,
+            y: 10 * TILE,
             type: 'heavy',
             isBoss: true
         });
@@ -793,7 +963,24 @@ function createLevel(charId, levelIdx) {
     const def = LEVEL_DEFS[charId][levelIdx];
     const level = buildLevel(def.chunks);
     level.name = def.name;
-    level.enemies = getEnemiesForLevel(charId, levelIdx, def.chunks);
+    const rawEnemies = getEnemiesForLevel(charId, levelIdx, def.chunks);
+
+    // Validate enemy positions — push out of solid tiles
+    level.enemies = rawEnemies.filter(e => {
+        const tx = Math.floor(e.x / TILE);
+        let ty = Math.floor(e.y / TILE);
+        let tile = level.getTile(tx, ty);
+        // Move up until in air
+        let attempts = 0;
+        while ((tile === 1 || tile === 2 || tile === 3) && attempts < 8) {
+            e.y -= TILE;
+            ty = Math.floor(e.y / TILE);
+            tile = level.getTile(tx, ty);
+            attempts++;
+        }
+        return e.y > 0; // Drop enemies pushed off top
+    });
+
     level.playerStart = { x: 2 * TILE, y: 11 * TILE };
     return level;
 }

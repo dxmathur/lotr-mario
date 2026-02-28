@@ -1,11 +1,11 @@
 // engine.js — Input, Physics, Collision, Camera
 
 const TILE = 32;
-const GRAVITY = 0.6;
-const MAX_FALL = 12;
+const GRAVITY = 0.45;
+const MAX_FALL = 14;
 const FRICTION = 0.85;
-const COYOTE_FRAMES = 6;
-const JUMP_BUFFER_FRAMES = 6;
+const COYOTE_FRAMES = 8;
+const JUMP_BUFFER_FRAMES = 8;
 
 // ── Input ──
 const Input = {
@@ -69,6 +69,7 @@ const Physics = {
     },
 
     moveY(entity, level, dt) {
+        const prevY = entity.y;
         entity.y += entity.vy * dt;
         entity.onGround = false;
         const tiles = this.getOverlappingTiles(entity, level);
@@ -87,6 +88,16 @@ const Physics = {
                     }
                 }
             }
+            // One-way platforms: only solid when landing from above
+            if (t.type === 5 && entity.vy > 0) {
+                const platTop = t.y * TILE;
+                const prevBottom = prevY + entity.h;
+                if (prevBottom <= platTop + 2) {
+                    entity.y = platTop - entity.h;
+                    entity.vy = 0;
+                    entity.onGround = true;
+                }
+            }
         }
     },
 
@@ -102,7 +113,7 @@ const Physics = {
                 if (tile > 0) {
                     results.push({
                         x: tx, y: ty, type: tile,
-                        solid: tile !== 4 && tile !== 9 // 4=coin, 9=decoration
+                        solid: tile === 1 || tile === 2 || tile === 3 // only ground/brick/stone
                     });
                 }
             }

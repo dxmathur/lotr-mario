@@ -15,8 +15,8 @@ class Player {
         this.lives = 3;
         this.score = 0;
         this.rings = 0;
-        this.hp = 3;
-        this.maxHp = 3;
+        this.hp = 5;
+        this.maxHp = 5;
         this.dead = false;
         this.deathTimer = 0;
         this.invincible = 0;
@@ -131,74 +131,80 @@ class Player {
 
         switch (char.id) {
             case 'frodo':
-                // Ring of Power — invisibility/invincibility
+                // Ring of Power + Sting — invisible, Sting auto-attacks nearby enemies
                 this.abilityActive = char.abilityDuration;
                 this.invincible = char.abilityDuration;
+                this.abilityState = { type: 'sting', active: true };
                 return true;
 
             case 'aragorn':
-                // Sword Dash — horizontal charge
+                // Anduril Flame Charge — blazing dash leaving fire trail
                 this.abilityActive = char.abilityDuration;
-                this.vx = this.facing * 12;
+                this.vx = this.facing * 14;
                 this.invincible = char.abilityDuration;
-                this.abilityState = { type: 'dash' };
+                this.abilityState = { type: 'flamedash', timer: 0 };
                 return true;
 
             case 'gandalf':
-                // Fireball — bouncing projectile
-                game.spawnProjectile(
-                    this.x + (this.facing > 0 ? this.w : -8),
-                    this.y + this.h / 2 - 8,
-                    this.facing * 6, -3,
-                    'fireball', this
-                );
+                // Glamdring — "You Shall Not Pass!" triple fireball spread
+                const gx = this.x + (this.facing > 0 ? this.w : -8);
+                const gy = this.y + this.h / 2 - 8;
+                game.spawnProjectile(gx, gy, this.facing * 7, 0, 'fireball', this);
+                game.spawnProjectile(gx, gy, this.facing * 6, -3, 'fireball', this);
+                game.spawnProjectile(gx, gy, this.facing * 6, 2.5, 'fireball', this);
                 return true;
 
             case 'legolas':
-                // Arrow Shot — fast ranged
-                game.spawnProjectile(
-                    this.x + (this.facing > 0 ? this.w : -8),
-                    this.y + this.h / 2 - 4,
-                    this.facing * 10, 0,
-                    'arrow', this
-                );
+                // Galadhrim Bow — Arrow Volley (3 arrows)
+                const lx = this.x + (this.facing > 0 ? this.w : -8);
+                const ly = this.y + this.h / 2 - 4;
+                game.spawnProjectile(lx, ly, this.facing * 11, 0, 'arrow', this);
+                game.spawnProjectile(lx, ly - 6, this.facing * 10, -2, 'arrow', this);
+                game.spawnProjectile(lx, ly + 6, this.facing * 10, 2, 'arrow', this);
                 return true;
 
             case 'gimli':
-                // Ground Pound — downward slam
+                // Erebor Battle Axe — throwing axe (air) or ground pound (grounded check removed)
                 if (!this.onGround) {
-                    this.vy = 15;
+                    // Ground pound slam
+                    this.vy = 16;
                     this.abilityState = { type: 'groundpound', active: true };
                     return true;
                 }
-                return false;
+                // Throwing axe (boomerang)
+                game.spawnProjectile(
+                    this.x + (this.facing > 0 ? this.w : -12),
+                    this.y + this.h / 2 - 8,
+                    this.facing * 8, -1,
+                    'throwaxe', this
+                );
+                return true;
 
             case 'sauron':
-                // Dark Blast — wide AOE
+                // Grond Dark Shockwave — ground-traveling wave
                 game.spawnProjectile(
-                    this.x + (this.facing > 0 ? this.w : -16),
-                    this.y + this.h / 2 - 12,
-                    this.facing * 5, 0,
-                    'darkblast', this
+                    this.x + (this.facing > 0 ? this.w : -20),
+                    this.y + this.h - 16,
+                    this.facing * 6, 0,
+                    'shockwave', this
                 );
                 return true;
 
             case 'saruman':
-                // Staff Beam — piercing projectile
+                // Palantir Staff — Mind Blast (piercing freeze beam)
                 game.spawnProjectile(
                     this.x + (this.facing > 0 ? this.w : -8),
                     this.y + this.h / 2 - 4,
-                    this.facing * 8, 0,
-                    'beam', this
+                    this.facing * 9, 0,
+                    'mindblast', this
                 );
                 return true;
 
             case 'gollum':
-                // Stealth Leap — fast dash + brief invincibility
+                // Precious Frenzy — berserk mode with speed boost + contact damage
                 this.abilityActive = char.abilityDuration;
                 this.invincible = char.abilityDuration;
-                this.vx = this.facing * 10;
-                this.vy = -6;
+                this.abilityState = { type: 'frenzy', active: true };
                 return true;
         }
         return false;
@@ -316,6 +322,16 @@ class Enemy {
             return this.deadTimer <= 0;
         }
 
+        // Freeze check (Saruman's mind blast)
+        if (this.frozen > 0) {
+            this.frozen -= dt;
+            if (this.frozen <= 0) {
+                this.vx = this.frozenVx || 0;
+                this.frozen = 0;
+            }
+            return false; // Don't update while frozen
+        }
+
         // Check if on screen (activate range)
         const dist = Math.abs(player.x - this.x);
         if (dist > 800 && this.type !== 'chaser') return false;
@@ -339,24 +355,24 @@ class Enemy {
                     const belowTile = level.getTile(Math.floor(checkX / TILE), Math.floor((this.y + this.h + 2) / TILE));
                     if (belowTile === 0) this.facing *= -1;
                 }
-                // Turn at walls
+                // Turn at walls (only solid tiles)
                 const wallTile = level.getTile(
                     Math.floor((this.facing > 0 ? this.x + this.w + 1 : this.x - 1) / TILE),
                     Math.floor((this.y + this.h / 2) / TILE)
                 );
-                if (wallTile > 0 && wallTile !== 4) this.facing *= -1;
+                if (wallTile === 1 || wallTile === 2 || wallTile === 3) this.facing *= -1;
                 break;
 
             case 'flyer':
                 this.vx = this.speed * this.facing;
                 this.x += this.vx * dt;
                 this.y = this.startY + Math.sin((this.time * 0.08 + this.sinOffset)) * 30;
-                // Turn at walls
+                // Turn at walls (only solid tiles)
                 const fwallTile = level.getTile(
                     Math.floor((this.facing > 0 ? this.x + this.w + 1 : this.x - 1) / TILE),
                     Math.floor((this.y + this.h / 2) / TILE)
                 );
-                if (fwallTile > 0 && fwallTile !== 4) this.facing *= -1;
+                if (fwallTile === 1 || fwallTile === 2 || fwallTile === 3) this.facing *= -1;
                 break;
 
             case 'heavy':
@@ -368,7 +384,7 @@ class Enemy {
                     Math.floor((this.facing > 0 ? this.x + this.w + 1 : this.x - 1) / TILE),
                     Math.floor((this.y + this.h / 2) / TILE)
                 );
-                if (hwallTile > 0 && hwallTile !== 4) this.facing *= -1;
+                if (hwallTile === 1 || hwallTile === 2 || hwallTile === 3) this.facing *= -1;
                 break;
 
             case 'shooter':
@@ -438,16 +454,63 @@ class Projectile {
         this.type = type;
         this.owner = owner;
         this.life = 180;
-        this.w = type === 'darkblast' ? 24 : 12;
-        this.h = type === 'darkblast' ? 24 : 8;
-        this.piercing = type === 'beam';
+        this.startX = x;
+        this.time = 0;
+        this.freezeDuration = 0;
+
+        // Type-specific setup
+        switch (type) {
+            case 'darkblast':
+            case 'shockwave':
+                this.w = 28; this.h = 28;
+                break;
+            case 'throwaxe':
+                this.w = 16; this.h = 16;
+                this.life = 120;
+                break;
+            case 'mindblast':
+                this.w = 16; this.h = 10;
+                this.freezeDuration = 90;
+                break;
+            default:
+                this.w = 12; this.h = 8;
+        }
+
+        this.piercing = type === 'beam' || type === 'mindblast' || type === 'shockwave';
         this.bouncing = type === 'fireball';
         this.isEnemy = type === 'enemyshot';
+        this.isBoomerang = type === 'throwaxe';
+        this.isGroundWave = type === 'shockwave';
+        this.damage = type === 'darkblast' || type === 'shockwave' || type === 'throwaxe' ? 2 : 1;
     }
 
     update(dt, level) {
         this.life -= dt;
+        this.time += dt;
         if (this.life <= 0) return true;
+
+        // Boomerang behavior (throwing axe)
+        if (this.isBoomerang) {
+            const progress = this.time / 60; // 0 to ~2 over lifetime
+            this.vx *= (1 - 0.03 * dt); // Slow down and reverse
+            if (this.time > 40) {
+                // Return direction
+                this.vx -= Math.sign(this.vx) * 0.4 * dt;
+            }
+            this.vy += 0.02 * dt;
+            // Spin visual handled in renderer
+        }
+
+        // Ground wave stays on ground level
+        if (this.isGroundWave) {
+            // Try to snap to ground
+            const tileY = Math.floor((this.y + this.h + 4) / TILE);
+            const tileBelow = level.getTile(Math.floor((this.x + this.w / 2) / TILE), tileY);
+            if (tileBelow === 0) {
+                // Fall to find ground
+                this.y += 2 * dt;
+            }
+        }
 
         this.x += this.vx * dt;
         this.y += this.vy * dt;
@@ -465,13 +528,15 @@ class Projectile {
             }
         }
 
-        // Hit wall
-        const wallTile = level.getTile(
-            Math.floor((this.x + this.w / 2) / TILE),
-            Math.floor((this.y + this.h / 2) / TILE)
-        );
-        if (wallTile > 0 && wallTile !== 4 && wallTile !== 5 && !this.piercing) {
-            return true;
+        // Hit wall (not for piercing/ground wave)
+        if (!this.piercing && !this.isBoomerang) {
+            const wallTile = level.getTile(
+                Math.floor((this.x + this.w / 2) / TILE),
+                Math.floor((this.y + this.h / 2) / TILE)
+            );
+            if (wallTile > 0 && wallTile !== 4 && wallTile !== 5) {
+                return true;
+            }
         }
 
         // Off screen

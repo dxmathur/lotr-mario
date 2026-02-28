@@ -223,25 +223,58 @@ const Renderer = {
             ctx.fillRect(px, py, player.w, player.h);
         }
 
+        // Weapon glow (always visible, pulses)
+        const weaponPulse = Math.sin(Date.now() * 0.005) * 0.15 + 0.35;
+        const wc = player.char.weaponColor || '#fff';
+        if (player.char.id === 'frodo') {
+            // Sting glow — brighter when enemies nearby
+            ctx.fillStyle = `rgba(68, 136, 255, ${weaponPulse * 0.6})`;
+            const swordX = player.facing > 0 ? px + player.w - 2 : px - 8;
+            ctx.fillRect(swordX, py + 8, 10, 3);
+        } else if (player.char.id === 'aragorn') {
+            // Anduril flame glow
+            ctx.fillStyle = `rgba(255, 102, 0, ${weaponPulse * 0.5})`;
+            const swordX = player.facing > 0 ? px + player.w - 2 : px - 12;
+            ctx.fillRect(swordX, py + 4, 14, 3);
+        } else if (player.char.id === 'gimli') {
+            // Axe head
+            ctx.fillStyle = `rgba(204, 68, 0, ${weaponPulse * 0.5})`;
+            const axeX = player.facing > 0 ? px + player.w : px - 8;
+            ctx.fillRect(axeX, py + 6, 8, 6);
+        }
+
         // Ability visual effects
         if (player.abilityActive > 0) {
             switch (player.char.id) {
                 case 'frodo':
-                    // Ring glow
-                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+                    // Ring + Sting glow — pulsing gold ring + blue blade aura
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(px - 2, py - 2, player.w + 4, player.h + 4);
+                    ctx.strokeRect(px - 3, py - 3, player.w + 6, player.h + 6);
+                    // Sting slash range indicator
+                    ctx.fillStyle = 'rgba(68, 136, 255, 0.15)';
+                    ctx.beginPath();
+                    ctx.arc(px + player.w / 2, py + player.h / 2, 80, 0, Math.PI * 2);
+                    ctx.fill();
                     break;
                 case 'aragorn':
-                    // Sword trail
-                    ctx.fillStyle = 'rgba(200, 200, 255, 0.6)';
-                    const trailX = player.facing > 0 ? px + player.w : px - 20;
-                    ctx.fillRect(trailX, py + 4, 20, player.h - 8);
+                    // Anduril flame trail
+                    ctx.fillStyle = 'rgba(255, 100, 0, 0.7)';
+                    const trailX = player.facing > 0 ? px + player.w : px - 24;
+                    ctx.fillRect(trailX, py + 2, 24, player.h - 4);
+                    // Flame glow
+                    ctx.fillStyle = 'rgba(255, 200, 0, 0.4)';
+                    ctx.fillRect(trailX + 4, py + 6, 16, player.h - 12);
                     break;
                 case 'gollum':
-                    // Stealth blur
-                    ctx.fillStyle = 'rgba(150, 150, 150, 0.3)';
-                    ctx.fillRect(px - 4, py - 4, player.w + 8, player.h + 8);
+                    // Frenzy aura — wild yellow/red pulsing
+                    const frenzyPulse = Math.sin(Date.now() * 0.02) * 0.3 + 0.5;
+                    ctx.strokeStyle = `rgba(255, 255, 0, ${frenzyPulse})`;
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(px - 4, py - 4, player.w + 8, player.h + 8);
+                    ctx.strokeStyle = `rgba(255, 0, 0, ${frenzyPulse * 0.5})`;
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(px - 6, py - 6, player.w + 12, player.h + 12);
                     break;
             }
         }
@@ -257,6 +290,15 @@ const Renderer = {
 
         if (enemy.dead) {
             ctx.globalAlpha = 0.5;
+        }
+
+        // Frozen effect (Saruman's mind blast)
+        if (enemy.frozen > 0) {
+            ctx.fillStyle = 'rgba(170, 100, 255, 0.3)';
+            ctx.fillRect(ex - 2, ey - 2, enemy.w + 4, enemy.h + 4);
+            ctx.strokeStyle = '#aa66ff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(ex - 2, ey - 2, enemy.w + 4, enemy.h + 4);
         }
 
         const frameIdx = enemy.animFrame % 2;
@@ -341,6 +383,54 @@ const Renderer = {
                 ctx.fillRect(px, py, proj.w, proj.h);
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.fillRect(px + 2, py + 2, proj.w - 4, proj.h - 4);
+                break;
+
+            case 'throwaxe':
+                // Spinning axe
+                ctx.save();
+                ctx.translate(px + proj.w / 2, py + proj.h / 2);
+                ctx.rotate(proj.time * 0.3);
+                ctx.fillStyle = '#cc4400';
+                ctx.fillRect(-8, -3, 16, 6);
+                ctx.fillStyle = '#888';
+                ctx.fillRect(-3, -8, 6, 16);
+                ctx.fillStyle = '#ffaa44';
+                ctx.fillRect(-2, -2, 4, 4);
+                ctx.restore();
+                break;
+
+            case 'shockwave':
+                // Dark ground wave
+                const waveSize = 14 + Math.sin(proj.time * 0.2) * 4;
+                ctx.fillStyle = 'rgba(80, 0, 0, 0.8)';
+                ctx.beginPath();
+                ctx.arc(px + proj.w / 2, py + proj.h / 2, waveSize, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(255, 50, 0, 0.5)';
+                ctx.beginPath();
+                ctx.arc(px + proj.w / 2, py + proj.h / 2, waveSize * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                // Ground sparks
+                ctx.fillStyle = '#ff4400';
+                for (let s = 0; s < 3; s++) {
+                    ctx.fillRect(
+                        px + proj.w / 2 + Math.sin(proj.time * 0.5 + s * 2) * waveSize,
+                        py + proj.h - 2,
+                        3, 3
+                    );
+                }
+                break;
+
+            case 'mindblast':
+                // Purple piercing beam
+                const mbPulse = Math.sin(proj.time * 0.3) * 0.2 + 0.8;
+                ctx.fillStyle = `rgba(170, 68, 255, ${mbPulse})`;
+                ctx.fillRect(px, py, proj.w, proj.h);
+                ctx.fillStyle = `rgba(220, 150, 255, ${mbPulse * 0.7})`;
+                ctx.fillRect(px + 2, py + 2, proj.w - 4, proj.h - 4);
+                // Sparkle
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(px + proj.w / 2 + Math.sin(proj.time * 0.5) * 4, py + 1, 2, 2);
                 break;
 
             case 'enemyshot':

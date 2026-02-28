@@ -172,7 +172,7 @@ const Game = {
         }
 
         // Add heart pickups
-        const heartCount = 2 + this.currentLevelIdx;
+        const heartCount = 3 + this.currentLevelIdx;
         for (let i = 0; i < heartCount; i++) {
             const hx = (3 + Math.floor(Math.random() * (level.width - 6))) * TILE;
             this.collectibles.push(new Collectible(hx, 10 * TILE, 'heart'));
@@ -219,41 +219,101 @@ const Game = {
             player.useAbility(this);
         }
 
-        // Ground pound landing check
+        // Ground pound landing check (Gimli)
         if (player.abilityState && player.abilityState.type === 'groundpound' &&
             player.abilityState.active && player.onGround) {
             player.abilityState.active = false;
-            Camera.shake(8, 15);
-            // Shockwave damage
+            Camera.shake(10, 18);
+            // Seismic shockwave damage — wider range
             for (const e of this.enemies) {
-                if (!e.dead && Math.abs(e.x - player.x) < 120 && Math.abs(e.y - player.y) < 50) {
-                    e.hit(2);
-                    player.score += 150;
-                    this.spawnDeathParticles(e.x, e.y, theme.particleColor);
+                if (!e.dead && Math.abs(e.x - player.x) < 160 && Math.abs(e.y - player.y) < 60) {
+                    e.hit(3);
+                    player.score += 200;
+                    this.spawnDeathParticles(e.x, e.y, '#ff8844');
                 }
             }
-            // Shockwave particles
-            for (let i = 0; i < 10; i++) {
+            // Seismic particles
+            for (let i = 0; i < 15; i++) {
                 this.particles.push(new Particle(
-                    player.x + player.w / 2 + (Math.random() - 0.5) * 60,
+                    player.x + player.w / 2 + (Math.random() - 0.5) * 100,
                     player.y + player.h,
-                    (Math.random() - 0.5) * 4,
-                    -Math.random() * 3,
-                    '#aa8844',
+                    (Math.random() - 0.5) * 5,
+                    -Math.random() * 4,
+                    '#cc6622',
                     20 + Math.random() * 20,
+                    5
+                ));
+            }
+        }
+
+        // Aragorn Flame Charge — dash + fire trail particles
+        if (player.abilityActive > 0 && player.abilityState && player.abilityState.type === 'flamedash') {
+            player.abilityState.timer += dt;
+            // Damage enemies on contact
+            for (const e of this.enemies) {
+                if (!e.dead && Physics.aabb(player, e)) {
+                    e.hit(3);
+                    player.score += 200;
+                    this.spawnDeathParticles(e.x, e.y, '#ff6600');
+                }
+            }
+            // Fire trail particles
+            if (player.abilityState.timer % 2 < 1) {
+                this.particles.push(new Particle(
+                    player.x + player.w / 2 + (Math.random() - 0.5) * 10,
+                    player.y + player.h - 4,
+                    (Math.random() - 0.5) * 2,
+                    -Math.random() * 2,
+                    Math.random() > 0.5 ? '#ff4400' : '#ffaa00',
+                    15 + Math.random() * 15,
                     4
                 ));
             }
         }
 
-        // Aragorn dash damage
-        if (player.abilityActive > 0 && player.char.id === 'aragorn') {
+        // Frodo Sting — auto-attack nearby enemies while invisible
+        if (player.abilityActive > 0 && player.abilityState && player.abilityState.type === 'sting') {
+            for (const e of this.enemies) {
+                if (!e.dead && Math.abs(e.x - player.x) < 80 && Math.abs(e.y - player.y) < 60) {
+                    // Sting auto-hit every 20 frames
+                    if (Math.floor(player.abilityActive) % 20 === 0) {
+                        e.hit(1);
+                        player.score += 100;
+                        // Blue Sting slash effect
+                        this.particles.push(new Particle(
+                            e.x + e.w / 2, e.y + e.h / 2,
+                            (Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3,
+                            '#4488ff', 10, 5
+                        ));
+                        if (e.hp <= 0) {
+                            this.spawnDeathParticles(e.x, e.y, '#4488ff');
+                        }
+                    }
+                }
+            }
+        }
+
+        // Gollum Frenzy — contact damage while berserk
+        if (player.abilityActive > 0 && player.abilityState && player.abilityState.type === 'frenzy') {
+            // Speed boost during frenzy
+            if (Input.left()) player.vx = -player.char.speed * 1.6;
+            if (Input.right()) player.vx = player.char.speed * 1.6;
+            // Contact damage
             for (const e of this.enemies) {
                 if (!e.dead && Physics.aabb(player, e)) {
                     e.hit(2);
                     player.score += 150;
-                    this.spawnDeathParticles(e.x, e.y, '#ccccff');
+                    this.spawnDeathParticles(e.x, e.y, '#ffff00');
                 }
+            }
+            // Frenzy particles
+            if (Math.random() > 0.5) {
+                this.particles.push(new Particle(
+                    player.x + Math.random() * player.w,
+                    player.y + Math.random() * player.h,
+                    (Math.random() - 0.5) * 2, -Math.random() * 2,
+                    '#ffff00', 8, 3
+                ));
             }
         }
 
@@ -294,10 +354,15 @@ const Game = {
             if (!proj.isEnemy) {
                 for (const e of this.enemies) {
                     if (!e.dead && Physics.aabb(proj, e)) {
-                        const killed = e.hit(proj.type === 'darkblast' ? 2 : 1);
+                        const killed = e.hit(proj.damage || 1);
                         if (killed) {
-                            player.score += e.isBoss ? 500 : 100;
+                            player.score += e.isBoss ? 500 : 150;
                             this.spawnDeathParticles(e.x, e.y, theme.particleColor);
+                        } else if (proj.freezeDuration > 0 && !e.frozen) {
+                            // Mind blast freezes enemies
+                            e.frozen = proj.freezeDuration;
+                            e.frozenVx = e.vx;
+                            e.vx = 0;
                         }
                         if (!proj.piercing) {
                             this.projectiles.splice(i, 1);
@@ -447,7 +512,8 @@ const Game = {
                     ctx, w, h,
                     this.currentChar.name,
                     LEVEL_DEFS[this.currentCharId][this.currentLevelIdx].name,
-                    this.currentLevelIdx
+                    this.currentLevelIdx,
+                    this.currentChar
                 );
                 break;
 

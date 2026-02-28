@@ -157,10 +157,10 @@ const Screens = {
             ctx.font = '10px monospace';
             ctx.fillText(char.title, cx + 58, cy + 34);
 
-            // Ability
-            ctx.fillStyle = '#6a8aaa';
+            // Weapon
+            ctx.fillStyle = char.weaponColor || '#6a8aaa';
             ctx.font = '10px monospace';
-            ctx.fillText(char.abilityName, cx + 10, cy + 60);
+            ctx.fillText(char.weapon || char.abilityName, cx + 10, cy + 60);
 
             ctx.fillStyle = '#557';
             ctx.font = '9px monospace';
@@ -216,7 +216,7 @@ const Screens = {
     drawHUD(ctx, w, player, levelName, charConfig) {
         // Background bar
         ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(0, 0, w, 36);
+        ctx.fillRect(0, 0, w, 40);
 
         // Character name
         ctx.fillStyle = '#FFD700';
@@ -231,7 +231,7 @@ const Screens = {
 
         // HP hearts
         for (let i = 0; i < player.maxHp; i++) {
-            const hx = 160 + i * 22;
+            const hx = 160 + i * 18;
             if (i < player.hp) {
                 ctx.fillStyle = '#ff3366';
             } else {
@@ -239,13 +239,13 @@ const Screens = {
             }
             // Simple heart
             ctx.beginPath();
-            ctx.arc(hx + 4, 12, 5, 0, Math.PI * 2);
-            ctx.arc(hx + 12, 12, 5, 0, Math.PI * 2);
+            ctx.arc(hx + 3, 12, 4, 0, Math.PI * 2);
+            ctx.arc(hx + 10, 12, 4, 0, Math.PI * 2);
             ctx.fill();
             ctx.beginPath();
             ctx.moveTo(hx, 14);
-            ctx.lineTo(hx + 8, 24);
-            ctx.lineTo(hx + 16, 14);
+            ctx.lineTo(hx + 7, 22);
+            ctx.lineTo(hx + 14, 14);
             ctx.closePath();
             ctx.fill();
         }
@@ -253,15 +253,15 @@ const Screens = {
         // Lives
         ctx.fillStyle = '#ccc';
         ctx.font = '14px monospace';
-        ctx.fillText(`x${player.lives}`, 240, 14);
+        ctx.fillText(`x${player.lives}`, 260, 14);
 
         // Rings
         ctx.fillStyle = '#FFD700';
-        ctx.fillText(`\u25CB ${player.rings}`, 290, 14);
+        ctx.fillText(`\u25CB ${player.rings}`, 310, 14);
 
         // Score
         ctx.fillStyle = '#fff';
-        ctx.fillText(`Score: ${player.score}`, 380, 14);
+        ctx.fillText(`Score: ${player.score}`, 400, 14);
 
         // Ability cooldown
         const cdMax = charConfig.abilityCooldown;
@@ -283,6 +283,11 @@ const Screens = {
         ctx.font = '10px monospace';
         ctx.textAlign = 'right';
         ctx.fillText(charConfig.abilityName, w - 10, 24);
+
+        // Weapon name
+        ctx.fillStyle = charConfig.weaponColor || '#aaa';
+        ctx.font = '10px monospace';
+        ctx.fillText(charConfig.weapon || '', w - 10, 34);
         ctx.textAlign = 'left';
     },
 
@@ -365,7 +370,7 @@ const Screens = {
     },
 
     // ── Level Intro ──
-    drawLevelIntro(ctx, w, h, charName, levelName, levelIdx) {
+    drawLevelIntro(ctx, w, h, charName, levelName, levelIdx, charConfig) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         ctx.fillRect(0, 0, w, h);
 
@@ -373,16 +378,29 @@ const Screens = {
 
         ctx.fillStyle = '#FFD700';
         ctx.font = 'bold 20px monospace';
-        ctx.fillText(charName, w / 2, 180);
+        ctx.fillText(charName, w / 2, 160);
 
         ctx.fillStyle = '#ccc';
         ctx.font = '24px monospace';
-        ctx.fillText(`Level ${levelIdx + 1}: ${levelName}`, w / 2, 220);
+        ctx.fillText(`Level ${levelIdx + 1}: ${levelName}`, w / 2, 200);
+
+        // Weapon info
+        if (charConfig && charConfig.weapon) {
+            ctx.fillStyle = charConfig.weaponColor || '#aaa';
+            ctx.font = 'bold 14px monospace';
+            ctx.fillText(`Weapon: ${charConfig.weapon}`, w / 2, 245);
+            ctx.fillStyle = '#888';
+            ctx.font = '12px monospace';
+            ctx.fillText(charConfig.weaponDesc || '', w / 2, 265);
+            ctx.fillStyle = '#6a8aaa';
+            ctx.font = '12px monospace';
+            ctx.fillText(`[E/Shift] ${charConfig.abilityName}`, w / 2, 285);
+        }
 
         const alpha = Math.sin(Date.now() * 0.004) * 0.5 + 0.5;
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.font = '14px monospace';
-        ctx.fillText('Press ENTER to begin', w / 2, 300);
+        ctx.fillText('Press ENTER to begin', w / 2, 330);
 
         ctx.textAlign = 'left';
     },
