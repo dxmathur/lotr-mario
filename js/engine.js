@@ -27,11 +27,23 @@ const Input = {
         });
     },
 
+    _pendingRelease: [],
+
+    simulatePress(code) {
+        this.keys[code] = true;
+        this._pendingRelease.push(code);
+    },
+
     update() {
         for (const k in this.keys) {
             this.justPressed[k] = this.keys[k] && !this._prev[k];
         }
         this._prev = { ...this.keys };
+        // Release simulated one-frame presses
+        for (const code of this._pendingRelease) {
+            this.keys[code] = false;
+        }
+        this._pendingRelease.length = 0;
     },
 
     isDown(code) { return !!this.keys[code]; },
@@ -184,5 +196,216 @@ const Camera = {
         this.shakeX = 0;
         this.shakeY = 0;
         this.shakeTimer = 0;
+    }
+};
+
+// ── Display (responsive scaling) ──
+const Display = {
+    canvas: null,
+    isMobile: false,
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
+    GAME_W: 800,
+    GAME_H: 480,
+
+    init(canvas) {
+        this.canvas = canvas;
+        const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+        this.isMobile = hasTouch && coarsePointer;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => this.resize(), 300);
+        });
+        // Prevent pull-to-refresh and overscroll
+        document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+        document.addEventListener('gesturestart', e => e.preventDefault());
+    },
+
+    resize() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const aspect = this.GAME_W / this.GAME_H;
+        let w, h;
+        if (vw / vh > aspect) {
+            h = vh;
+            w = h * aspect;
+        } else {
+            w = vw;
+            h = w / aspect;
+        }
+        this.scale = w / this.GAME_W;
+        this.offsetX = (vw - w) / 2;
+        this.offsetY = (vh - h) / 2;
+        this.canvas.style.width = w + 'px';
+        this.canvas.style.height = h + 'px';
+    },
+
+    toGameX(pageX) {
+        return (pageX - this.offsetX) / this.scale;
+    },
+
+    toGameY(pageY) {
+        return (pageY - this.offsetY) / this.scale;
+    },
+
+    isPortrait() {
+        return window.innerHeight > window.innerWidth;
+    }
+};
+
+// ── Touch Controls ──
+const TouchControls = {
+    active: false,
+    activeTouches: {},
+    // Button definitions in game coordinates
+    buttons: {
+        left:  { x: 20,  y: 380, w: 70, h: 70, label: '<' },
+        right: { x: 110, y: 380, w: 70, h: 70, label: '>' },
+        jump:  { x: 660, y: 370, w: 85, h: 85, label: 'B' },
+        ability: { x: 565, y: 390, w: 65, h: 65, label: 'A' },
+        pause: { x: 740, y: 5, w: 50, h: 30, label: '||' },
+    },
+    pressed: {},
+
+    init() {
+        this.active = Display.isMobile;
+        if (!this.active) return;
+
+        const canvas = Display.canvas;
+        canvas.addEventListener('touchstart', e => this.onTouch(e), { passive: false });
+        canvas.addEventListener('touchmove', e => this.onTouch(e), { passive: false });
+        canvas.addEventListener('touchend', e => this.onTouchEnd(e), { passive: false });
+        canvas.addEventListener('touchcancel', e => this.onTouchEnd(e), { passive: false });
+    },
+
+    onTouch(e) {
+        e.preventDefault();
+        // Update all active touches
+        for (const t of e.touches) {
+            this.activeTouches[t.identifier] = {
+                gx: Display.toGameX(t.pageX),
+                gy: Display.toGameY(t.pageY)
+            };
+        }
+        this.updateButtonStates();
+    },
+
+    onTouchEnd(e) {
+        e.preventDefault();
+        // Rebuild active touches from remaining touches
+        const remaining = {};
+        for (const t of e.touches) {
+            remaining[t.identifier] = {
+                gx: Display.toGameX(t.pageX),
+                gy: Display.toGameY(t.pageY)
+            };
+        }
+        // Detect ended touches — forward taps outside buttons to Screens
+        for (const id in this.activeTouches) {
+            if (!(id in remaining)) {
+                const touch = this.activeTouches[id];
+                if (!this.hitTestAny(touch.gx, touch.gy)) {
+                    Screens.handleTap(touch.gx, touch.gy, Game.state);
+                }
+            }
+        }
+        this.activeTouches = remaining;
+        this.updateButtonStates();
+    },
+
+    hitTestAny(gx, gy) {
+        for (const key in this.buttons) {
+            const b = this.buttons[key];
+            if (gx >= b.x && gx <= b.x + b.w && gy >= b.y && gy <= b.y + b.h) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    updateButtonStates() {
+        // Reset all
+        const newPressed = {};
+        for (const key in this.buttons) newPressed[key] = false;
+
+        // Check each touch against each button
+        for (const id in this.activeTouches) {
+            const t = this.activeTouches[id];
+            for (const key in this.buttons) {
+                const b = this.buttons[key];
+                if (t.gx >= b.x && t.gx <= b.x + b.w && t.gy >= b.y && t.gy <= b.y + b.h) {
+                    newPressed[key] = true;
+                }
+            }
+        }
+
+        // Map to Input.keys
+        Input.keys['ArrowLeft'] = newPressed.left;
+        Input.keys['ArrowRight'] = newPressed.right;
+        Input.keys['Space'] = newPressed.jump;
+
+        // Ability — trigger only on press start
+        if (newPressed.ability && !this.pressed.ability) {
+            Input.keys['KeyE'] = true;
+            Input._pendingRelease.push('KeyE');
+        }
+
+        // Pause — trigger only on press start
+        if (newPressed.pause && !this.pressed.pause) {
+            Input.keys['Escape'] = true;
+            Input._pendingRelease.push('Escape');
+        }
+
+        this.pressed = newPressed;
+    },
+
+    _roundRect(ctx, x, y, w, h, r) {
+        if (ctx.roundRect) {
+            ctx.roundRect(x, y, w, h, r);
+        } else {
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+    },
+
+    draw(ctx) {
+        if (!this.active) return;
+
+        ctx.save();
+        for (const key in this.buttons) {
+            const b = this.buttons[key];
+            const isPressed = this.pressed[key];
+            const r = 10;
+
+            // Background
+            ctx.fillStyle = isPressed ? 'rgba(255, 255, 255, 0.35)' : 'rgba(255, 255, 255, 0.12)';
+            ctx.beginPath();
+            this._roundRect(ctx, b.x, b.y, b.w, b.h, r);
+            ctx.fill();
+
+            // Border
+            ctx.strokeStyle = isPressed ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            this._roundRect(ctx, b.x, b.y, b.w, b.h, r);
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = isPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.5)';
+            ctx.font = key === 'pause' ? 'bold 14px monospace' : 'bold 22px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
+        }
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+        ctx.restore();
     }
 };

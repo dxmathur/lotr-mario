@@ -9,14 +9,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 canvas {
+    display: block;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-    border: 2px solid #333;
-    cursor: none;
-    transform: scale(1.8);
 }

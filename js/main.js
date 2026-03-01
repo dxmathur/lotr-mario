@@ -39,7 +39,9 @@ const Game = {
         this.canvas = document.getElementById('game');
         this.ctx = this.canvas.getContext('2d');
         Renderer.init(this.canvas);
+        Display.init(this.canvas);
         Input.init();
+        TouchControls.init();
         initSprites();
         this.loadSave();
         this.lastTime = performance.now();
@@ -496,6 +498,13 @@ const Game = {
         const w = this.canvas.width;
         const h = this.canvas.height;
 
+        // Portrait mode — show rotate prompt
+        if (Display.isMobile && Display.isPortrait()) {
+            Renderer.clear();
+            Screens.drawRotatePrompt(ctx, w, h);
+            return;
+        }
+
         Renderer.clear();
 
         switch (this.state) {
@@ -521,6 +530,9 @@ const Game = {
             case 'paused':
             case 'levelcomplete':
                 this.renderGame();
+                if (this.state === 'playing') {
+                    TouchControls.draw(ctx);
+                }
                 if (this.state === 'paused') {
                     Screens.drawPause(ctx, w, h);
                 }

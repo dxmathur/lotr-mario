@@ -81,13 +81,17 @@ const Screens = {
         const promptAlpha = Math.sin(this.titleTimer * 0.06) * 0.5 + 0.5;
         ctx.fillStyle = `rgba(255, 255, 255, ${promptAlpha})`;
         ctx.font = '18px monospace';
-        ctx.fillText('Press ENTER to start', w / 2, 350);
+        ctx.fillText(Display.isMobile ? 'Tap to start' : 'Press ENTER to start', w / 2, 350);
 
         // Controls hint
         ctx.fillStyle = '#666';
         ctx.font = '12px monospace';
-        ctx.fillText('Arrow Keys: Move  |  Space: Jump  |  E/Shift: Ability', w / 2, 420);
-        ctx.fillText('P/Esc: Pause', w / 2, 440);
+        if (Display.isMobile) {
+            ctx.fillText('Touch controls on screen', w / 2, 420);
+        } else {
+            ctx.fillText('Arrow Keys: Move  |  Space: Jump  |  E/Shift: Ability', w / 2, 420);
+            ctx.fillText('P/Esc: Pause', w / 2, 440);
+        }
 
         ctx.textAlign = 'left';
     },
@@ -183,7 +187,7 @@ const Screens = {
         ctx.fillStyle = '#666';
         ctx.font = '12px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('Arrow Keys to select  |  ENTER to play', w / 2, h - 25);
+        ctx.fillText(Display.isMobile ? 'Tap to select, tap again to play' : 'Arrow Keys to select  |  ENTER to play', w / 2, h - 25);
         ctx.textAlign = 'left';
     },
 
@@ -317,7 +321,7 @@ const Screens = {
             const alpha = Math.sin(this.levelCompleteTimer * 0.06) * 0.5 + 0.5;
             ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
             ctx.font = '16px monospace';
-            ctx.fillText('Press ENTER to continue', w / 2, 340);
+            ctx.fillText(Display.isMobile ? 'Tap to continue' : 'Press ENTER to continue', w / 2, 340);
         }
 
         ctx.textAlign = 'left';
@@ -344,7 +348,7 @@ const Screens = {
             const alpha = Math.sin(this.gameOverTimer * 0.06) * 0.5 + 0.5;
             ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
             ctx.font = '16px monospace';
-            ctx.fillText('Press ENTER to return to menu', w / 2, 330);
+            ctx.fillText(Display.isMobile ? 'Tap to return to menu' : 'Press ENTER to return to menu', w / 2, 330);
         }
 
         ctx.textAlign = 'left';
@@ -363,8 +367,13 @@ const Screens = {
 
         ctx.fillStyle = '#aaa';
         ctx.font = '14px monospace';
-        ctx.fillText('Press P or ESC to resume', w / 2, 260);
-        ctx.fillText('Press Q to quit to menu', w / 2, 285);
+        if (Display.isMobile) {
+            ctx.fillText('Tap top half to resume', w / 2, 260);
+            ctx.fillText('Tap bottom half to quit', w / 2, 285);
+        } else {
+            ctx.fillText('Press P or ESC to resume', w / 2, 260);
+            ctx.fillText('Press Q to quit to menu', w / 2, 285);
+        }
 
         ctx.textAlign = 'left';
     },
@@ -394,13 +403,13 @@ const Screens = {
             ctx.fillText(charConfig.weaponDesc || '', w / 2, 265);
             ctx.fillStyle = '#6a8aaa';
             ctx.font = '12px monospace';
-            ctx.fillText(`[E/Shift] ${charConfig.abilityName}`, w / 2, 285);
+            ctx.fillText(Display.isMobile ? `[A] ${charConfig.abilityName}` : `[E/Shift] ${charConfig.abilityName}`, w / 2, 285);
         }
 
         const alpha = Math.sin(Date.now() * 0.004) * 0.5 + 0.5;
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.font = '14px monospace';
-        ctx.fillText('Press ENTER to begin', w / 2, 330);
+        ctx.fillText(Display.isMobile ? 'Tap to begin' : 'Press ENTER to begin', w / 2, 330);
 
         ctx.textAlign = 'left';
     },
@@ -408,5 +417,74 @@ const Screens = {
     resetTimers() {
         this.levelCompleteTimer = 0;
         this.gameOverTimer = 0;
+    },
+
+    // ── Tap handling (mobile) ──
+    handleTap(gx, gy, gameState) {
+        switch (gameState) {
+            case 'title':
+            case 'intro':
+                Input.simulatePress('Enter');
+                break;
+            case 'levelcomplete':
+                if (this.levelCompleteTimer > 60) Input.simulatePress('Enter');
+                break;
+            case 'gameover':
+                if (this.gameOverTimer > 90) Input.simulatePress('Enter');
+                break;
+            case 'select': {
+                const cols = 4;
+                const cardW = 160;
+                const cardH = 140;
+                const gapX = 20;
+                const gapY = 15;
+                const startX = (800 - (cols * cardW + (cols - 1) * gapX)) / 2;
+                const startY = 65;
+                for (let i = 0; i < CHARACTER_ORDER.length; i++) {
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    const cx = startX + col * (cardW + gapX);
+                    const cy = startY + row * (cardH + gapY);
+                    if (gx >= cx && gx <= cx + cardW && gy >= cy && gy <= cy + cardH) {
+                        if (this.selectRow === row && this.selectCol === col) {
+                            // Already selected — confirm
+                            Input.simulatePress('Enter');
+                        } else {
+                            // Select this card
+                            this.selectRow = row;
+                            this.selectCol = col;
+                            this.selectIndex = row * cols + col;
+                        }
+                        return;
+                    }
+                }
+                break;
+            }
+            case 'playing':
+                break;
+            case 'paused':
+                if (gy < 240) {
+                    Input.simulatePress('Escape');
+                } else {
+                    Input.simulatePress('KeyQ');
+                }
+                break;
+        }
+    },
+
+    // ── Rotate prompt (portrait) ──
+    drawRotatePrompt(ctx, w, h) {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 24px monospace';
+        ctx.fillText('Rotate Your Device', w / 2, h / 2 - 20);
+
+        ctx.fillStyle = '#888';
+        ctx.font = '14px monospace';
+        ctx.fillText('Landscape mode recommended', w / 2, h / 2 + 20);
+        ctx.textAlign = 'left';
     }
 };
